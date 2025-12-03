@@ -106,16 +106,18 @@ export type Lexeme = z.infer<typeof LexemeSchema>;
 /**
  * Complete word details from Ekilex API
  */
-export const WordDetailsSchema = z.object({
-  wordId: z.number(),
-  wordValue: z.string(),
-  wordValuePrese: z.string().optional(),
-  lang: z.string(),
-  homonymNr: z.number().optional(),
-  wordTypeCodes: z.array(z.string()).optional(),
-  forms: z.array(FormSchema).optional(),
-  lexemes: z.array(LexemeSchema).optional(),
-});
+export const WordDetailsSchema = z
+  .object({
+    wordId: z.number(),
+    wordValue: z.string(),
+    wordValuePrese: z.string().optional().nullable(),
+    lang: z.string(),
+    homonymNr: z.number().optional().nullable(),
+    wordTypeCodes: z.array(z.string()).optional().nullable(), // Often null in real API
+    forms: z.array(FormSchema).optional(),
+    lexemes: z.array(LexemeSchema).optional(),
+  })
+  .passthrough(); // Allow additional unknown fields from real API
 
 export type WordDetails = z.infer<typeof WordDetailsSchema>;
 
@@ -149,16 +151,16 @@ export const ClassifierSchema = z
   .object({
     code: z.string(),
     value: z.string(),
-    // Real Ekilex API fields
-    name: z.string().optional(),
-    origin: z.string().optional(),
-    parentOrigin: z.string().optional(),
-    parentCode: z.string().optional(),
-    comment: z.string().optional(),
-    datasets: z.array(z.string()).optional(),
+    // Real Ekilex API fields - can be null in real responses
+    name: z.string().optional().nullable(),
+    origin: z.string().optional().nullable(),
+    parentOrigin: z.string().optional().nullable(),
+    parentCode: z.string().optional().nullable(),
+    comment: z.string().optional().nullable(),
+    datasets: z.array(z.string()).optional().nullable(),
     // For compatibility with our display logic
-    lang: z.string().optional(),
-    type: z.string().optional(),
+    lang: z.string().optional().nullable(),
+    type: z.string().optional().nullable(),
   })
   .passthrough(); // Allow additional unknown fields from real API
 
