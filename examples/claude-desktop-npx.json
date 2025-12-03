@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ekilex": {
+      "command": "npx",
+      "args": ["-y", "ekilex-mcp"],
+      "env": {
+        "EKILEX_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}

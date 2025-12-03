@@ -37,14 +37,18 @@
     "language",
     "nlp"
   ],
-  "author": "",
+  "author": "TisteAI",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/keeleinstituut/ekilex-mcp"
+    "url": "https://github.com/TisteAI/ekilex_mcp"
+  },
+  "homepage": "https://github.com/TisteAI/ekilex_mcp#readme",
+  "bugs": {
+    "url": "https://github.com/TisteAI/ekilex_mcp/issues"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

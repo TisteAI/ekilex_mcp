@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build output (we build in Docker)
+dist/
+
+# Development files
+*.log
+*.tsbuildinfo
+coverage/
+
+# IDE and editor
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Tests (not needed in production image)
+test/
+vitest.config.ts
+*.test.ts
+
+# Documentation (not needed in image)
+*.md
+!README.md
+docs/
+
+# CI/CD
+.github/
+
+# Environment files (secrets should be passed at runtime)
+.env
+.env.*
+
+# Development config
+.prettierrc
+.prettierignore
+eslint.config.js

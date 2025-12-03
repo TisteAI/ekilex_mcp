@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ekilex": {
+      "command": "node",
+      "args": ["/path/to/ekilex_mcp/dist/index.js"],
+      "env": {
+        "EKILEX_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
