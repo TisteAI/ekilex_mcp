@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import type { EkilexApiClient } from '../api/ekilex-client.js';
 import { formatErrorForMcp } from '../errors.js';
-import type { MeaningDetails, MeaningDefinition, MeaningWord } from '../types/index.js';
+import type {
+  MeaningDetails,
+  MeaningDefinition,
+  MeaningWord,
+  McpToolResponse,
+} from '../types/index.js';
 
 /**
  * Input schema for get_meaning_details tool
@@ -93,9 +98,7 @@ function formatMeaningDetails(details: MeaningDetails): string {
  * Create the get_meaning_details tool handler
  */
 export function createGetMeaningDetailsHandler(client: EkilexApiClient) {
-  return async (
-    input: GetMeaningDetailsInput
-  ): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: GetMeaningDetailsInput): Promise<McpToolResponse> => {
     try {
       const details = await client.getMeaningDetails(input.meaningId, input.datasets);
 

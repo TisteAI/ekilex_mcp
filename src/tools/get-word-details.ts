@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { EkilexApiClient } from '../api/ekilex-client.js';
 import { formatErrorForMcp } from '../errors.js';
-import type { WordDetails, Lexeme, Form } from '../types/index.js';
+import type { WordDetails, Lexeme, Form, McpToolResponse } from '../types/index.js';
 
 /**
  * Input schema for get_word_details tool
@@ -133,9 +133,7 @@ function formatWordDetails(details: WordDetails): string {
  * Create the get_word_details tool handler
  */
 export function createGetWordDetailsHandler(client: EkilexApiClient) {
-  return async (
-    input: GetWordDetailsInput
-  ): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: GetWordDetailsInput): Promise<McpToolResponse> => {
     try {
       const details = await client.getWordDetails(input.wordId, input.datasets);
 

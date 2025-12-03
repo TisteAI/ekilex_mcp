@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { EkilexApiClient } from '../api/ekilex-client.js';
 import { formatErrorForMcp } from '../errors.js';
-import type { WordSearchResult } from '../types/index.js';
+import type { WordSearchResult, McpToolResponse } from '../types/index.js';
 
 /**
  * Input schema for search_word tool
@@ -60,7 +60,7 @@ function formatWordResults(words: WordSearchResult[], query: string): string {
  * Create the search_word tool handler
  */
 export function createSearchWordHandler(client: EkilexApiClient) {
-  return async (input: SearchWordInput): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: SearchWordInput): Promise<McpToolResponse> => {
     try {
       const results = await client.searchWord(input.query, input.datasets);
 

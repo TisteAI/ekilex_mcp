@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { EkilexApiClient } from '../api/ekilex-client.js';
 import { formatErrorForMcp } from '../errors.js';
-import type { Dataset } from '../types/index.js';
+import type { Dataset, McpToolResponse } from '../types/index.js';
 
 /**
  * Input schema for list_datasets tool (no parameters required)
@@ -43,9 +43,7 @@ function formatDatasets(datasets: Dataset[]): string {
  * Create the list_datasets tool handler
  */
 export function createListDatasetsHandler(client: EkilexApiClient) {
-  return async (
-    _input: ListDatasetsInput
-  ): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (_input: ListDatasetsInput): Promise<McpToolResponse> => {
     try {
       const datasets = await client.getDatasets();
 

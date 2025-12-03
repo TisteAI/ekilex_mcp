@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { EkilexApiClient } from '../api/ekilex-client.js';
 import { formatErrorForMcp } from '../errors.js';
-import type { Domain } from '../types/index.js';
+import type { Domain, McpToolResponse } from '../types/index.js';
 
 /**
  * Common domain origins for reference
@@ -72,7 +72,7 @@ function formatOrigins(origins: string[]): string {
  * Create the get_domains tool handler
  */
 export function createGetDomainsHandler(client: EkilexApiClient) {
-  return async (input: GetDomainsInput): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: GetDomainsInput): Promise<McpToolResponse> => {
     try {
       // List origins mode
       if (input.listOrigins) {
