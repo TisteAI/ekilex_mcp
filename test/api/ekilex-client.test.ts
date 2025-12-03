@@ -10,7 +10,12 @@ import {
   mockWordSearchResults,
   mockWordDetails,
   mockDatasets,
+  mockMeaningSearchResults,
+  mockMeaningDetails,
+  mockClassifiers,
+  mockDomains,
 } from '../helpers/mock-ekilex-client.js';
+import { loadConfig } from '../../src/config/index.js';
 
 describe('EkilexApiClient', () => {
   const defaultOptions = {
@@ -223,6 +228,301 @@ describe('EkilexApiClient', () => {
 
       expect(results).toHaveLength(2);
       expect(results[0]?.code).toBe('eki');
+    });
+  });
+
+  describe('searchMeaning', () => {
+    it('should return meaning search results for valid query', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockMeaningSearchResults }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.searchMeaning('greeting');
+
+      expect(results).toHaveLength(1);
+      expect(results[0]?.meaningId).toBe(1);
+      expect(results[0]?.definition).toBe('A greeting');
+    });
+
+    it('should include datasets in URL when provided', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      await client.searchMeaning('greeting', 'eki,psv');
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringMatching(/api\/meaning\/search\/greeting\/eki.*psv/),
+        expect.any(Object)
+      );
+    });
+
+    it('should return empty array when no results', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.searchMeaning('nonexistent');
+
+      expect(results).toEqual([]);
+    });
+  });
+
+  describe('getMeaningDetails', () => {
+    it('should return meaning details for valid meaning ID', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockMeaningDetails }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const result = await client.getMeaningDetails(1);
+
+      expect(result).toBeDefined();
+      expect(result?.meaningId).toBe(1);
+      expect(result?.definitions).toHaveLength(2);
+    });
+
+    it('should include datasets in URL when provided', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockMeaningDetails }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      await client.getMeaningDetails(1, 'eki');
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://ekilex.eki.ee/api/meaning/details/1/eki',
+        expect.any(Object)
+      );
+    });
+
+    it('should return undefined when meaning not found', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: undefined }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const result = await client.getMeaningDetails(99999);
+
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('getClassifiers', () => {
+    it('should return classifiers for valid type', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockClassifiers }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.getClassifiers('POS');
+
+      expect(results).toHaveLength(3);
+      expect(results[0]?.code).toBe('S');
+      expect(results[0]?.value).toBe('noun');
+    });
+
+    it('should encode classifier type in URL', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      await client.getClassifiers('VALUE_STATE');
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://ekilex.eki.ee/api/classifiers/VALUE_STATE',
+        expect.any(Object)
+      );
+    });
+
+    it('should return empty array when no classifiers found', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.getClassifiers('UNKNOWN');
+
+      expect(results).toEqual([]);
+    });
+  });
+
+  describe('getDomains', () => {
+    it('should return domains for valid origin', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: mockDomains }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.getDomains('eki');
+
+      expect(results).toHaveLength(2);
+      expect(results[0]?.code).toBe('med');
+      expect(results[0]?.value).toBe('medicine');
+    });
+
+    it('should encode origin in URL', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      await client.getDomains('lenoch');
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://ekilex.eki.ee/api/domains/lenoch',
+        expect.any(Object)
+      );
+    });
+
+    it('should return empty array when no domains found', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.getDomains('unknown');
+
+      expect(results).toEqual([]);
+    });
+  });
+
+  describe('getDomainOrigins', () => {
+    it('should return list of domain origins', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: ['eki', 'lenoch', 'mt'] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.getDomainOrigins();
+
+      expect(results).toHaveLength(3);
+      expect(results).toContain('eki');
+      expect(results).toContain('lenoch');
+    });
+
+    it('should call correct endpoint', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      await client.getDomainOrigins();
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://ekilex.eki.ee/api/domainorigins',
+        expect.any(Object)
+      );
+    });
+
+    it('should return empty array when no origins available', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: true, data: [] }),
+      });
+
+      const client = new EkilexApiClient({
+        ...defaultOptions,
+        fetch: fetchMock,
+      });
+
+      const results = await client.getDomainOrigins();
+
+      expect(results).toEqual([]);
+    });
+  });
+
+  describe('fromConfig', () => {
+    it('should create client from config object', () => {
+      const originalEnv = process.env.EKILEX_API_KEY;
+      process.env.EKILEX_API_KEY = 'test-key-from-config';
+
+      try {
+        const config = loadConfig();
+        const client = EkilexApiClient.fromConfig(config);
+
+        expect(client).toBeInstanceOf(EkilexApiClient);
+      } finally {
+        if (originalEnv !== undefined) {
+          process.env.EKILEX_API_KEY = originalEnv;
+        } else {
+          delete process.env.EKILEX_API_KEY;
+        }
+      }
     });
   });
 

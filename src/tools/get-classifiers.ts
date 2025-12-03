@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { EkilexApiClient } from '../api/ekilex-client.js';
 import { formatErrorForMcp } from '../errors.js';
-import type { Classifier } from '../types/index.js';
+import type { Classifier, McpToolResponse } from '../types/index.js';
 
 /**
  * Valid classifier types in Ekilex
@@ -92,9 +92,7 @@ function formatClassifiers(classifiers: Classifier[], type: string): string {
  * Create the get_classifiers tool handler
  */
 export function createGetClassifiersHandler(client: EkilexApiClient) {
-  return async (
-    input: GetClassifiersInput
-  ): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: GetClassifiersInput): Promise<McpToolResponse> => {
     try {
       const classifiers = await client.getClassifiers(input.type);
 

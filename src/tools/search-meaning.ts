@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { EkilexApiClient } from '../api/ekilex-client.js';
 import { formatErrorForMcp } from '../errors.js';
-import type { MeaningSearchResult } from '../types/index.js';
+import type { MeaningSearchResult, McpToolResponse } from '../types/index.js';
 
 /**
  * Input schema for search_meaning tool
@@ -63,9 +63,7 @@ function formatMeaningResults(meanings: MeaningSearchResult[], query: string): s
  * Create the search_meaning tool handler
  */
 export function createSearchMeaningHandler(client: EkilexApiClient) {
-  return async (
-    input: SearchMeaningInput
-  ): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: SearchMeaningInput): Promise<McpToolResponse> => {
     try {
       const results = await client.searchMeaning(input.query, input.datasets);
 
