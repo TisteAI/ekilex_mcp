@@ -16,7 +16,9 @@ export const GetDomainsInputSchema = z.object({
     .string()
     .min(1)
     .optional()
-    .describe('Domain origin code (e.g., "eki", "lenoch"). Use listOrigins to see available origins.'),
+    .describe(
+      'Domain origin code (e.g., "eki", "lenoch"). Use listOrigins to see available origins.'
+    ),
   listOrigins: z
     .boolean()
     .optional()
@@ -34,10 +36,7 @@ function formatDomains(domains: Domain[], origin: string): string {
     return `No domains found for origin '${origin}'. Use listOrigins: true to see available domain origins.`;
   }
 
-  const lines: string[] = [
-    `Found ${domains.length} domain(s) for origin '${origin}':`,
-    '',
-  ];
+  const lines: string[] = [`Found ${domains.length} domain(s) for origin '${origin}':`, ''];
 
   for (const domain of domains) {
     lines.push(`- **${domain.code}**: ${domain.value}`);
@@ -57,10 +56,7 @@ function formatOrigins(origins: string[]): string {
     return 'No domain origins available.';
   }
 
-  const lines: string[] = [
-    `Available domain origins (${origins.length}):`,
-    '',
-  ];
+  const lines: string[] = [`Available domain origins (${origins.length}):`, ''];
 
   for (const origin of origins) {
     lines.push(`- **${origin}**`);
@@ -76,9 +72,7 @@ function formatOrigins(origins: string[]): string {
  * Create the get_domains tool handler
  */
 export function createGetDomainsHandler(client: EkilexApiClient) {
-  return async (
-    input: GetDomainsInput
-  ): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: GetDomainsInput): Promise<{ content: { type: 'text'; text: string }[] }> => {
     try {
       // List origins mode
       if (input.listOrigins) {

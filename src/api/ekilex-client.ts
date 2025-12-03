@@ -66,10 +66,7 @@ export class EkilexApiClient {
   /**
    * Make a request to the Ekilex API
    */
-  private async request<T>(
-    endpoint: string,
-    schema: z.ZodType<T>
-  ): Promise<T | undefined> {
+  private async request<T>(endpoint: string, schema: z.ZodType<T>): Promise<T | undefined> {
     const url = `${this.baseUrl}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -103,9 +100,7 @@ export class EkilexApiClient {
       clearTimeout(timeoutId);
 
       if (error instanceof z.ZodError) {
-        throw new EkilexApiError(
-          `Invalid response from Ekilex API: ${error.message}`
-        );
+        throw new EkilexApiError(`Invalid response from Ekilex API: ${error.message}`);
       }
 
       if (error instanceof EkilexApiError) {
@@ -116,10 +111,7 @@ export class EkilexApiClient {
         if (error.name === 'AbortError') {
           throw new TimeoutError(this.timeout);
         }
-        if (
-          error.message.includes('ECONNREFUSED') ||
-          error.message.includes('ENOTFOUND')
-        ) {
+        if (error.message.includes('ECONNREFUSED') || error.message.includes('ENOTFOUND')) {
           throw new ServiceUnavailableError(error);
         }
       }
@@ -163,10 +155,7 @@ export class EkilexApiClient {
   /**
    * Search for words in Ekilex
    */
-  async searchWord(
-    query: string,
-    datasets?: string
-  ): Promise<WordSearchResult[]> {
+  async searchWord(query: string, datasets?: string): Promise<WordSearchResult[]> {
     const endpoint = datasets
       ? `/api/word/search/${encodeURIComponent(query)}/${encodeURIComponent(datasets)}`
       : `/api/word/search/${encodeURIComponent(query)}`;
@@ -178,10 +167,7 @@ export class EkilexApiClient {
   /**
    * Get detailed information about a word
    */
-  async getWordDetails(
-    wordId: number,
-    datasets?: string
-  ): Promise<WordDetails | undefined> {
+  async getWordDetails(wordId: number, datasets?: string): Promise<WordDetails | undefined> {
     const endpoint = datasets
       ? `/api/word/details/${wordId}/${encodeURIComponent(datasets)}`
       : `/api/word/details/${wordId}`;
@@ -192,10 +178,7 @@ export class EkilexApiClient {
   /**
    * Search for meanings
    */
-  async searchMeaning(
-    query: string,
-    datasets?: string
-  ): Promise<MeaningSearchResult[]> {
+  async searchMeaning(query: string, datasets?: string): Promise<MeaningSearchResult[]> {
     const endpoint = datasets
       ? `/api/meaning/search/${encodeURIComponent(query)}/${encodeURIComponent(datasets)}`
       : `/api/meaning/search/${encodeURIComponent(query)}`;

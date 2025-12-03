@@ -18,10 +18,7 @@ function formatDatasets(datasets: Dataset[]): string {
     return 'No datasets available.';
   }
 
-  const lines: string[] = [
-    `Found ${datasets.length} dataset(s):`,
-    '',
-  ];
+  const lines: string[] = [`Found ${datasets.length} dataset(s):`, ''];
 
   // Sort by name
   const sorted = [...datasets].sort((a, b) => a.name.localeCompare(b.name));

@@ -8,10 +8,7 @@ import type { MeaningDetails, MeaningDefinition, MeaningWord } from '../types/in
  */
 export const GetMeaningDetailsInputSchema = z.object({
   meaningId: z.number().int().positive().describe('Meaning ID from search_meaning results'),
-  datasets: z
-    .string()
-    .optional()
-    .describe('Comma-separated dataset codes to filter results'),
+  datasets: z.string().optional().describe('Comma-separated dataset codes to filter results'),
 });
 
 export type GetMeaningDetailsInput = z.infer<typeof GetMeaningDetailsInputSchema>;
