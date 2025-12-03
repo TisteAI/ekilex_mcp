@@ -27,12 +27,14 @@ describe('MCP Server Integration', () => {
     it('should return all tool descriptions', () => {
       const tools = getToolDescriptions();
 
-      expect(tools).toHaveLength(5);
+      expect(tools).toHaveLength(7);
       expect(tools.map((t) => t.name)).toContain('search_word');
       expect(tools.map((t) => t.name)).toContain('get_word_details');
       expect(tools.map((t) => t.name)).toContain('search_meaning');
+      expect(tools.map((t) => t.name)).toContain('get_meaning_details');
       expect(tools.map((t) => t.name)).toContain('list_datasets');
       expect(tools.map((t) => t.name)).toContain('get_classifiers');
+      expect(tools.map((t) => t.name)).toContain('get_domains');
     });
 
     it('should have descriptions for all tools', () => {

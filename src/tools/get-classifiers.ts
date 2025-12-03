@@ -7,11 +7,11 @@ import type { Classifier } from '../types/index.js';
  * Valid classifier types in Ekilex
  */
 export const CLASSIFIER_TYPES = [
-  'POS',        // Parts of speech
-  'MORPH',      // Morphological codes
-  'DOMAIN',     // Subject domains
-  'REGISTER',   // Language registers (formal, informal, etc.)
-  'DERIV',      // Derivation types
+  'POS', // Parts of speech
+  'MORPH', // Morphological codes
+  'DOMAIN', // Subject domains
+  'REGISTER', // Language registers (formal, informal, etc.)
+  'DERIV', // Derivation types
   'VALUE_STATE', // Value states
 ] as const;
 

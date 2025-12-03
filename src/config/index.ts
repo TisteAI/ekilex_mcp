@@ -36,18 +36,14 @@ export function loadConfig(): Config {
   const rawConfig = {
     apiKey: process.env['EKILEX_API_KEY'],
     baseUrl: process.env['EKILEX_BASE_URL'] ?? 'https://ekilex.eki.ee',
-    timeout: process.env['EKILEX_TIMEOUT']
-      ? parseInt(process.env['EKILEX_TIMEOUT'], 10)
-      : 30000,
+    timeout: process.env['EKILEX_TIMEOUT'] ? parseInt(process.env['EKILEX_TIMEOUT'], 10) : 30000,
     logLevel: process.env['LOG_LEVEL'] ?? 'info',
   };
 
   const result = ConfigSchema.safeParse(rawConfig);
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((e) => `${e.path.join('.')}: ${e.message}`)
-      .join(', ');
+    const errors = result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
     throw new ConfigurationError(`Invalid configuration: ${errors}`);
   }
 

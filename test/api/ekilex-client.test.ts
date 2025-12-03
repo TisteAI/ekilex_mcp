@@ -6,7 +6,11 @@ import {
   ServiceUnavailableError,
   TimeoutError,
 } from '../../src/errors.js';
-import { mockWordSearchResults, mockWordDetails, mockDatasets } from '../helpers/mock-ekilex-client.js';
+import {
+  mockWordSearchResults,
+  mockWordDetails,
+  mockDatasets,
+} from '../helpers/mock-ekilex-client.js';
 
 describe('EkilexApiClient', () => {
   const defaultOptions = {

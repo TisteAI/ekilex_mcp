@@ -56,10 +56,7 @@ export class RateLimitError extends EkilexMcpError {
  */
 export class ServiceUnavailableError extends EkilexMcpError {
   constructor(cause?: Error) {
-    super(
-      'Ekilex API is temporarily unavailable. Please try again later.',
-      'EKILEX_UNAVAILABLE'
-    );
+    super('Ekilex API is temporarily unavailable. Please try again later.', 'EKILEX_UNAVAILABLE');
     this.name = 'ServiceUnavailableError';
     if (cause) {
       this.cause = cause;

@@ -32,10 +32,7 @@ function formatMeaningResults(meanings: MeaningSearchResult[], query: string): s
     return `No meanings found matching '${query}'. Try different search terms or use search_word to search by word form instead.`;
   }
 
-  const lines: string[] = [
-    `Found ${meanings.length} meaning(s) matching '${query}':`,
-    '',
-  ];
+  const lines: string[] = [`Found ${meanings.length} meaning(s) matching '${query}':`, ''];
 
   for (const meaning of meanings) {
     lines.push(`**Meaning ID: ${meaning.meaningId}**`);
@@ -97,6 +94,6 @@ export function createSearchMeaningHandler(client: EkilexApiClient) {
 export const searchMeaningTool = {
   name: 'search_meaning',
   description:
-    'Search for Estonian words by semantic meaning or concept. Useful when you know what concept you\'re looking for but not the exact word. Returns meanings with associated words.',
+    "Search for Estonian words by semantic meaning or concept. Useful when you know what concept you're looking for but not the exact word. Returns meanings with associated words.",
   inputSchema: SearchMeaningInputSchema,
 };

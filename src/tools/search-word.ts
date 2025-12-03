@@ -32,10 +32,7 @@ function formatWordResults(words: WordSearchResult[], query: string): string {
     return `No words found matching '${query}'. Try using wildcards (* for any characters, ? for single character) or checking the spelling.`;
   }
 
-  const lines: string[] = [
-    `Found ${words.length} word(s) matching '${query}':`,
-    '',
-  ];
+  const lines: string[] = [`Found ${words.length} word(s) matching '${query}':`, ''];
 
   for (const word of words) {
     const parts = [`**${word.wordValue}**`];
@@ -63,9 +60,7 @@ function formatWordResults(words: WordSearchResult[], query: string): string {
  * Create the search_word tool handler
  */
 export function createSearchWordHandler(client: EkilexApiClient) {
-  return async (
-    input: SearchWordInput
-  ): Promise<{ content: { type: 'text'; text: string }[] }> => {
+  return async (input: SearchWordInput): Promise<{ content: { type: 'text'; text: string }[] }> => {
     try {
       const results = await client.searchWord(input.query, input.datasets);
 

@@ -8,10 +8,7 @@ import type { WordDetails, Lexeme, Form } from '../types/index.js';
  */
 export const GetWordDetailsInputSchema = z.object({
   wordId: z.number().int().positive().describe('Word ID from search_word results'),
-  datasets: z
-    .string()
-    .optional()
-    .describe('Comma-separated dataset codes to filter results'),
+  datasets: z.string().optional().describe('Comma-separated dataset codes to filter results'),
 });
 
 export type GetWordDetailsInput = z.infer<typeof GetWordDetailsInputSchema>;
