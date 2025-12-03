@@ -20,16 +20,35 @@ This project enables LLMs to access Estonian language resources from [Ekilex](ht
 
 ## Installation
 
+### Using npx (Recommended)
+
+No installation required - run directly:
+
 ```bash
-# Clone the repository
+EKILEX_API_KEY=your-api-key npx ekilex-mcp
+```
+
+### Global Installation
+
+```bash
+npm install -g ekilex-mcp
+EKILEX_API_KEY=your-api-key ekilex-mcp
+```
+
+### From Source
+
+```bash
 git clone https://github.com/TisteAI/ekilex_mcp.git
 cd ekilex_mcp
-
-# Install dependencies
 npm install
-
-# Build
 npm run build
+```
+
+### Docker
+
+```bash
+docker pull tisteai/ekilex-mcp:latest
+docker run -e EKILEX_API_KEY=your-api-key tisteai/ekilex-mcp
 ```
 
 ## Configuration
@@ -58,8 +77,8 @@ Add to your Claude Desktop configuration (`claude_desktop_config.json`):
 {
   "mcpServers": {
     "ekilex": {
-      "command": "node",
-      "args": ["/path/to/ekilex_mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "ekilex-mcp"],
       "env": {
         "EKILEX_API_KEY": "your-api-key"
       }
@@ -67,6 +86,8 @@ Add to your Claude Desktop configuration (`claude_desktop_config.json`):
   }
 }
 ```
+
+See `examples/` directory for more configuration examples.
 
 ### HTTP Transport
 
@@ -91,6 +112,19 @@ HTTP Endpoints:
 ```bash
 EKILEX_API_KEY=your-api-key node dist/index.js
 ```
+
+### Docker
+
+Run with HTTP transport:
+
+```bash
+docker run -p 3000:3000 \
+  -e EKILEX_API_KEY=your-api-key \
+  -e MCP_TRANSPORT=http \
+  tisteai/ekilex-mcp
+```
+
+Or use Docker Compose (see `examples/docker-compose.yml`).
 
 ## Available Tools
 
@@ -184,11 +218,13 @@ The server implements read operations from the Ekilex API:
 
 ## Status
 
-**Phase 3 Complete** - HTTP transport, MCP resources, and logging:
+**Phase 4 Complete** - Production-ready deployment:
 - 7 MCP tools implemented
 - 3 MCP resources (datasets, classifiers, domains)
 - HTTP/SSE transport with health endpoint
-- Configurable logging
+- Docker container support
+- npm package ready for publishing
+- GitHub Actions CI/CD pipeline
 - 169 tests, 89%+ coverage
 
 See [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) for the full roadmap.

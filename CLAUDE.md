@@ -138,11 +138,15 @@ Mock data in `test/helpers/mock-ekilex-client.ts` matches real Ekilex API struct
 
 ## Current Status
 
-**Phase 3 Complete** - HTTP transport, MCP resources, and logging:
+**Phase 4 Complete** - Production-ready deployment:
 - 7 MCP tools: `search_word`, `get_word_details`, `search_meaning`, `get_meaning_details`, `list_datasets`, `get_classifiers`, `get_domains`
 - 3 MCP resources: datasets, classifiers, domains
 - HTTP/SSE transport with health endpoint
 - Configurable logger
+- Docker container with multi-stage build
+- npm package ready for publishing
+- GitHub Actions CI/CD pipeline
+- Example configurations for Claude Desktop, Cursor
 
 Coverage: 89%+ statements, 97%+ functions
 
