@@ -12,18 +12,29 @@ export const EkilexResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 
 /**
  * Word search result from Ekilex API
+ * Based on ekilex/data/Word.java - uses passthrough for additional fields
  */
-export const WordSearchResultSchema = z.object({
-  wordId: z.number(),
-  wordValue: z.string(),
-  wordValuePrese: z.string().optional(),
-  homonymNr: z.number().optional(),
-  lang: z.string(),
-  wordTypeCodes: z.array(z.string()).optional(),
-  prefixoid: z.boolean().optional(),
-  suffixoid: z.boolean().optional(),
-  foreign: z.boolean().optional(),
-});
+export const WordSearchResultSchema = z
+  .object({
+    wordId: z.number(),
+    wordValue: z.string(),
+    wordValuePrese: z.string().optional(),
+    homonymNr: z.number().optional(),
+    lang: z.string(),
+    wordTypeCodes: z.array(z.string()).optional().nullable(),
+    prefixoid: z.boolean().optional(),
+    suffixoid: z.boolean().optional(),
+    foreign: z.boolean().optional(),
+    // Additional real API fields
+    displayMorphCode: z.string().optional().nullable(),
+    genderCode: z.string().optional().nullable(),
+    aspectCode: z.string().optional().nullable(),
+    vocalForm: z.string().optional().nullable(),
+    morphophonoForm: z.string().optional().nullable(),
+    isWordPublic: z.boolean().optional(),
+    datasetCodes: z.array(z.string()).optional(),
+  })
+  .passthrough(); // Allow additional unknown fields from real API
 
 export type WordSearchResult = z.infer<typeof WordSearchResultSchema>;
 
@@ -67,18 +78,28 @@ export type Usage = z.infer<typeof UsageSchema>;
 
 /**
  * Lexeme (word sense) in word details
+ * Based on ekilex/data/Lexeme.java - uses passthrough for additional fields
  */
-export const LexemeSchema = z.object({
-  lexemeId: z.number(),
-  meaningId: z.number(),
-  datasetCode: z.string().optional(),
-  level1: z.number().optional(),
-  level2: z.number().optional(),
-  wordId: z.number(),
-  meaning: MeaningSchema.optional(),
-  usages: z.array(UsageSchema).optional(),
-  pos: z.array(z.string()).optional(),
-});
+export const LexemeSchema = z
+  .object({
+    lexemeId: z.number(),
+    meaningId: z.number(),
+    datasetCode: z.string().optional().nullable(),
+    level1: z.number().optional().nullable(),
+    level2: z.number().optional().nullable(),
+    wordId: z.number(),
+    meaning: MeaningSchema.optional(),
+    usages: z.array(UsageSchema).optional(),
+    pos: z.array(z.string()).optional(),
+    // Additional real API fields
+    datasetName: z.string().optional().nullable(),
+    levels: z.string().optional().nullable(),
+    reliability: z.number().optional().nullable(),
+    weight: z.number().optional().nullable(),
+    isWord: z.boolean().optional(),
+    isCollocation: z.boolean().optional(),
+  })
+  .passthrough(); // Allow additional unknown fields from real API
 
 export type Lexeme = z.infer<typeof LexemeSchema>;
 
@@ -100,26 +121,46 @@ export type WordDetails = z.infer<typeof WordDetailsSchema>;
 
 /**
  * Dataset information
+ * Based on ekilex/data/Dataset.java - uses passthrough for additional fields
  */
-export const DatasetSchema = z.object({
-  code: z.string(),
-  name: z.string(),
-  description: z.string().optional(),
-  contact: z.string().optional(),
-  isPublic: z.boolean().optional(),
-});
+export const DatasetSchema = z
+  .object({
+    code: z.string(),
+    name: z.string(),
+    description: z.string().optional().nullable(),
+    contact: z.string().optional().nullable(),
+    isPublic: z.boolean().optional(),
+    // Additional real API fields
+    type: z.string().optional().nullable(),
+    imageUrl: z.string().optional().nullable(),
+    isVisible: z.boolean().optional(),
+    isSuperior: z.boolean().optional(),
+    origins: z.array(z.string()).optional(),
+  })
+  .passthrough(); // Allow additional unknown fields from real API
 
 export type Dataset = z.infer<typeof DatasetSchema>;
 
 /**
  * Classifier (POS, MORPH, DOMAIN, etc.)
+ * Based on ekilex/data/Classifier.java - uses passthrough for additional fields
  */
-export const ClassifierSchema = z.object({
-  code: z.string(),
-  value: z.string(),
-  lang: z.string().optional(),
-  type: z.string().optional(),
-});
+export const ClassifierSchema = z
+  .object({
+    code: z.string(),
+    value: z.string(),
+    // Real Ekilex API fields
+    name: z.string().optional(),
+    origin: z.string().optional(),
+    parentOrigin: z.string().optional(),
+    parentCode: z.string().optional(),
+    comment: z.string().optional(),
+    datasets: z.array(z.string()).optional(),
+    // For compatibility with our display logic
+    lang: z.string().optional(),
+    type: z.string().optional(),
+  })
+  .passthrough(); // Allow additional unknown fields from real API
 
 export type Classifier = z.infer<typeof ClassifierSchema>;
 
