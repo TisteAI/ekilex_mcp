@@ -15,6 +15,15 @@ export const ConfigSchema = z.object({
 
   /** Log level */
   logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+
+  /** Transport type: stdio or http */
+  transport: z.enum(['stdio', 'http']).default('stdio'),
+
+  /** HTTP port (only used when transport is 'http') */
+  httpPort: z.number().int().min(1).max(65535).default(3000),
+
+  /** HTTP host (only used when transport is 'http') */
+  httpHost: z.string().default('localhost'),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -38,6 +47,9 @@ export function loadConfig(): Config {
     baseUrl: process.env['EKILEX_BASE_URL'] ?? 'https://ekilex.eki.ee',
     timeout: process.env['EKILEX_TIMEOUT'] ? parseInt(process.env['EKILEX_TIMEOUT'], 10) : 30000,
     logLevel: process.env['LOG_LEVEL'] ?? 'info',
+    transport: process.env['MCP_TRANSPORT'] ?? 'stdio',
+    httpPort: process.env['MCP_HTTP_PORT'] ? parseInt(process.env['MCP_HTTP_PORT'], 10) : 3000,
+    httpHost: process.env['MCP_HTTP_HOST'] ?? 'localhost',
   };
 
   const result = ConfigSchema.safeParse(rawConfig);

@@ -33,12 +33,45 @@ describe('Configuration', () => {
       delete process.env['EKILEX_BASE_URL'];
       delete process.env['EKILEX_TIMEOUT'];
       delete process.env['LOG_LEVEL'];
+      delete process.env['MCP_TRANSPORT'];
+      delete process.env['MCP_HTTP_PORT'];
+      delete process.env['MCP_HTTP_HOST'];
 
       const config = loadConfig();
 
       expect(config.baseUrl).toBe('https://ekilex.eki.ee');
       expect(config.timeout).toBe(30000);
       expect(config.logLevel).toBe('info');
+      expect(config.transport).toBe('stdio');
+      expect(config.httpPort).toBe(3000);
+      expect(config.httpHost).toBe('localhost');
+    });
+
+    it('should load transport config from environment variables', () => {
+      process.env['EKILEX_API_KEY'] = 'test-api-key-12345';
+      process.env['MCP_TRANSPORT'] = 'http';
+      process.env['MCP_HTTP_PORT'] = '8080';
+      process.env['MCP_HTTP_HOST'] = '0.0.0.0';
+
+      const config = loadConfig();
+
+      expect(config.transport).toBe('http');
+      expect(config.httpPort).toBe(8080);
+      expect(config.httpHost).toBe('0.0.0.0');
+    });
+
+    it('should throw ConfigurationError when transport is invalid', () => {
+      process.env['EKILEX_API_KEY'] = 'test-key';
+      process.env['MCP_TRANSPORT'] = 'websocket';
+
+      expect(() => loadConfig()).toThrow(ConfigurationError);
+    });
+
+    it('should throw ConfigurationError when HTTP port is invalid', () => {
+      process.env['EKILEX_API_KEY'] = 'test-key';
+      process.env['MCP_HTTP_PORT'] = '99999';
+
+      expect(() => loadConfig()).toThrow(ConfigurationError);
     });
 
     it('should throw ConfigurationError when API key is missing', () => {
@@ -83,6 +116,9 @@ describe('Configuration', () => {
         baseUrl: 'https://ekilex.eki.ee',
         timeout: 30000,
         logLevel: 'info' as const,
+        transport: 'stdio' as const,
+        httpPort: 3000,
+        httpHost: 'localhost',
       };
 
       expect(() => validateConfig(config)).not.toThrow();
@@ -94,6 +130,9 @@ describe('Configuration', () => {
         baseUrl: 'https://ekilex.eki.ee',
         timeout: 30000,
         logLevel: 'info' as const,
+        transport: 'stdio' as const,
+        httpPort: 3000,
+        httpHost: 'localhost',
       };
 
       expect(() => validateConfig(config)).toThrow(ConfigurationError);
