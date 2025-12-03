@@ -15,6 +15,8 @@ This project enables LLMs to access Estonian language resources from [Ekilex](ht
 - **Dataset Browsing** - Access to 80+ dictionaries and terminology databases
 - **Classifiers** - Parts of speech, morphology, domains, registers
 - **Domain Classification** - Subject area categorization
+- **HTTP Transport** - REST API with health endpoint and SSE support
+- **MCP Resources** - Direct access to datasets, classifiers, and domains
 
 ## Installation
 
@@ -32,17 +34,23 @@ npm run build
 
 ## Configuration
 
-Set your Ekilex API key as an environment variable:
+### Environment Variables
 
-```bash
-export EKILEX_API_KEY=your-api-key
-```
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `EKILEX_API_KEY` | Yes | - | API key from ekilex.ee |
+| `EKILEX_BASE_URL` | No | `https://ekilex.eki.ee` | Ekilex API base URL |
+| `EKILEX_TIMEOUT` | No | `30000` | Request timeout (ms) |
+| `LOG_LEVEL` | No | `info` | Log level: debug, info, warn, error |
+| `MCP_TRANSPORT` | No | `stdio` | Transport: `stdio` or `http` |
+| `MCP_HTTP_PORT` | No | `3000` | HTTP server port |
+| `MCP_HTTP_HOST` | No | `localhost` | HTTP server host |
 
 Get your API key from [Ekilex](https://ekilex.ee) user profile page.
 
 ## Usage
 
-### With Claude Desktop
+### With Claude Desktop (stdio transport)
 
 Add to your Claude Desktop configuration (`claude_desktop_config.json`):
 
@@ -60,7 +68,25 @@ Add to your Claude Desktop configuration (`claude_desktop_config.json`):
 }
 ```
 
-### Standalone
+### HTTP Transport
+
+Start the server with HTTP transport for REST API access:
+
+```bash
+# Development mode
+npm run dev:http
+
+# Production mode
+npm run start:http
+```
+
+HTTP Endpoints:
+- `GET /` - Server info
+- `GET /health` - Health check with status
+- `GET /sse` - SSE endpoint for MCP clients
+- `POST /message` - MCP message endpoint
+
+### Standalone (stdio)
 
 ```bash
 EKILEX_API_KEY=your-api-key node dist/index.js
@@ -78,6 +104,14 @@ EKILEX_API_KEY=your-api-key node dist/index.js
 | `get_classifiers` | Get POS, morphology, domain, register classifiers |
 | `get_domains` | Get domain classifications by origin |
 
+## MCP Resources
+
+| Resource URI | Description |
+|--------------|-------------|
+| `ekilex://datasets` | List of all available datasets |
+| `ekilex://classifiers/{type}` | Classifier values (POS, MORPH, DOMAIN, REGISTER) |
+| `ekilex://domains/{origin}` | Domain classifications by origin |
+
 ## Development
 
 ### Prerequisites
@@ -88,13 +122,16 @@ EKILEX_API_KEY=your-api-key node dist/index.js
 ### Scripts
 
 ```bash
-npm run build       # Build TypeScript
-npm run dev         # Development mode with watch
-npm test            # Run tests
+npm run build          # Build TypeScript
+npm run dev            # Development mode (stdio)
+npm run dev:http       # Development mode (HTTP)
+npm run start          # Production mode (stdio)
+npm run start:http     # Production mode (HTTP)
+npm test               # Run tests
 npm run test:coverage  # Run tests with coverage
-npm run lint        # Lint code
-npm run format      # Format code with Prettier
-npm run typecheck   # Type check
+npm run lint           # Lint code
+npm run format         # Format code with Prettier
+npm run typecheck      # Type check
 ```
 
 ### Project Structure
@@ -107,6 +144,8 @@ ekilex_mcp/
 │   ├── tools/         # MCP tool implementations
 │   ├── types/         # Zod schemas and types
 │   ├── errors.ts      # Error types
+│   ├── http-server.ts # HTTP/SSE transport
+│   ├── logger.ts      # Logging utility
 │   ├── server.ts      # MCP server setup
 │   └── index.ts       # Entry point
 ├── test/
@@ -145,7 +184,12 @@ The server implements read operations from the Ekilex API:
 
 ## Status
 
-**Phase 2 Complete** - All 7 core tools implemented with 90%+ test coverage.
+**Phase 3 Complete** - HTTP transport, MCP resources, and logging:
+- 7 MCP tools implemented
+- 3 MCP resources (datasets, classifiers, domains)
+- HTTP/SSE transport with health endpoint
+- Configurable logging
+- 169 tests, 89%+ coverage
 
 See [DEVELOPMENT_PLAN.md](./DEVELOPMENT_PLAN.md) for the full roadmap.
 

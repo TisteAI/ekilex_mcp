@@ -9,6 +9,7 @@ This is an MCP (Model Context Protocol) server that provides access to Estonian 
 - **Runtime**: Node.js 22+
 - **Language**: TypeScript (ESM modules)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
+- **HTTP Server**: Express (for HTTP transport)
 - **Validation**: Zod
 - **Testing**: Vitest with v8 coverage
 - **Linting**: ESLint 9 (flat config)
@@ -21,8 +22,10 @@ src/
 ├── api/ekilex-client.ts    # HTTP client for Ekilex API
 ├── config/index.ts         # Environment configuration
 ├── errors.ts               # Custom error types
-├── server.ts               # MCP server setup and tool registration
-├── index.ts                # Entry point (stdio transport)
+├── http-server.ts          # HTTP/SSE transport server
+├── logger.ts               # Configurable logging utility
+├── server.ts               # MCP server setup, tools, and resources
+├── index.ts                # Entry point (stdio/http transport)
 ├── tools/                  # MCP tool implementations
 │   ├── search-word.ts
 │   ├── get-word-details.ts
@@ -32,20 +35,26 @@ src/
 │   ├── get-classifiers.ts
 │   └── get-domains.ts
 └── types/
-    └── ekilex.ts           # Zod schemas for API responses
+    ├── ekilex.ts           # Zod schemas for API responses
+    └── index.ts            # Shared types (McpToolResponse)
 
 test/
 ├── api/                    # API client tests
 ├── tools/                  # Tool handler tests
 ├── integration/            # Server and real API tests
-└── helpers/                # Mock data and utilities
+├── helpers/                # Mock data and utilities
+├── http-server.test.ts     # HTTP server tests
+└── logger.test.ts          # Logger tests
 ```
 
 ## Key Commands
 
 ```bash
 npm run build          # Compile TypeScript to dist/
-npm run dev            # Watch mode for development
+npm run dev            # Watch mode (stdio transport)
+npm run dev:http       # Watch mode (HTTP transport)
+npm run start          # Production (stdio transport)
+npm run start:http     # Production (HTTP transport)
 npm test               # Run Vitest tests
 npm run test:coverage  # Tests with coverage report
 npm run lint           # ESLint check
@@ -65,6 +74,29 @@ Each tool in `src/tools/` follows this pattern:
 
 Tools are registered in `src/server.ts` using `server.tool()`.
 
+### MCP Resources
+
+Resources provide direct data access without tool calls:
+- `ekilex://datasets` - All available datasets
+- `ekilex://classifiers/{type}` - Classifier values by type
+- `ekilex://domains/{origin}` - Domain classifications
+
+### HTTP Transport
+
+`HttpServer` in `src/http-server.ts`:
+- Express server with SSE transport
+- Health endpoint at `/health`
+- SSE endpoint at `/sse` for MCP clients
+- Message endpoint at `/message` for client requests
+- Request logging middleware
+
+### Logger
+
+`src/logger.ts` provides:
+- Level-based filtering (debug, info, warn, error)
+- Timestamped output
+- `NoopLogger` for testing
+
 ### API Client
 
 `EkilexApiClient` in `src/api/ekilex-client.ts`:
@@ -80,33 +112,49 @@ Zod schemas in `src/types/ekilex.ts`:
 - Use `.nullable()` for fields that can be `null`
 - Types are inferred with `z.infer<typeof Schema>`
 
+Shared types in `src/types/index.ts`:
+- `McpToolResponse` - Standard tool response type with MCP SDK compatibility
+
 ## Testing Strategy
 
 - **Unit tests**: Mock `EkilexApiClient` with `createMockEkilexClient()`
 - **API tests**: Mock `fetch` function injected via constructor
+- **HTTP tests**: Use supertest with Express app
 - **Integration tests**: Skip unless `EKILEX_API_KEY` is set
 
 Mock data in `test/helpers/mock-ekilex-client.ts` matches real Ekilex API structure.
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `EKILEX_API_KEY` | Yes | API key from ekilex.ee |
-| `EKILEX_BASE_URL` | No | Default: `https://ekilex.eki.ee` |
-| `EKILEX_TIMEOUT` | No | Default: `30000` (ms) |
-| `LOG_LEVEL` | No | Default: `info` |
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `EKILEX_API_KEY` | Yes | - | API key from ekilex.ee |
+| `EKILEX_BASE_URL` | No | `https://ekilex.eki.ee` | Ekilex API base URL |
+| `EKILEX_TIMEOUT` | No | `30000` | Request timeout (ms) |
+| `LOG_LEVEL` | No | `info` | Log level: debug, info, warn, error |
+| `MCP_TRANSPORT` | No | `stdio` | Transport: `stdio` or `http` |
+| `MCP_HTTP_PORT` | No | `3000` | HTTP server port |
+| `MCP_HTTP_HOST` | No | `localhost` | HTTP server host |
 
 ## Current Status
 
-**Phase 2 Complete** - All 7 core tools implemented:
-- `search_word`, `get_word_details`
-- `search_meaning`, `get_meaning_details`
-- `list_datasets`, `get_classifiers`, `get_domains`
+**Phase 3 Complete** - HTTP transport, MCP resources, and logging:
+- 7 MCP tools: `search_word`, `get_word_details`, `search_meaning`, `get_meaning_details`, `list_datasets`, `get_classifiers`, `get_domains`
+- 3 MCP resources: datasets, classifiers, domains
+- HTTP/SSE transport with health endpoint
+- Configurable logger
 
-Coverage: 91%+ statements, 85%+ functions
+Coverage: 89%+ statements, 97%+ functions
 
 ## Development Notes
+
+### IMPORTANT: Documentation Updates
+
+**Every time a development phase is implemented, documentation MUST be updated:**
+1. Update `README.md` with new features, configuration, and usage
+2. Update `CLAUDE.md` with new architecture, files, and environment variables
+3. Update `DEVELOPMENT_PLAN.md` status if applicable
+4. Commit documentation changes with the implementation
 
 ### Adding a New Tool
 
@@ -115,6 +163,14 @@ Coverage: 91%+ statements, 85%+ functions
 3. Register in `src/server.ts`
 4. Add tests in `test/tools/new-tool.test.ts`
 5. Update mock client if new API method needed
+6. Update documentation (README.md, CLAUDE.md)
+
+### Adding a New Resource
+
+1. Add resource registration in `src/server.ts` using `server.resource()`
+2. Use `ResourceTemplate` for parameterized URIs
+3. Return `{ contents: [{ uri, mimeType, text }] }`
+4. Update documentation
 
 ### Working with Ekilex API
 
@@ -129,6 +185,7 @@ Coverage: 91%+ statements, 85%+ functions
 - Strict TypeScript with `noUncheckedIndexedAccess`
 - Prettier for formatting (run before commit)
 - No default exports
+- Use `McpToolResponse` type for tool handlers
 
 ## Useful References
 
