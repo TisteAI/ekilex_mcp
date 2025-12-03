@@ -20,6 +20,13 @@ export {
 } from './search-meaning.js';
 
 export {
+  getMeaningDetailsTool,
+  createGetMeaningDetailsHandler,
+  GetMeaningDetailsInputSchema,
+  type GetMeaningDetailsInput,
+} from './get-meaning-details.js';
+
+export {
   listDatasetsTool,
   createListDatasetsHandler,
   ListDatasetsInputSchema,
@@ -33,3 +40,11 @@ export {
   type GetClassifiersInput,
   CLASSIFIER_TYPES,
 } from './get-classifiers.js';
+
+export {
+  getDomainsTool,
+  createGetDomainsHandler,
+  GetDomainsInputSchema,
+  type GetDomainsInput,
+  DOMAIN_ORIGINS,
+} from './get-domains.js';

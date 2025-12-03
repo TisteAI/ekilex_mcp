@@ -14,12 +14,14 @@ import {
   type Classifier,
   type Domain,
   type MeaningSearchResult,
+  type MeaningDetails,
   WordSearchResultSchema,
   WordDetailsSchema,
   DatasetSchema,
   ClassifierSchema,
   DomainSchema,
   MeaningSearchResultSchema,
+  MeaningDetailsSchema,
   EkilexResponseSchema,
 } from '../types/index.js';
 
@@ -200,6 +202,20 @@ export class EkilexApiClient {
 
     const result = await this.request(endpoint, z.array(MeaningSearchResultSchema));
     return result ?? [];
+  }
+
+  /**
+   * Get detailed information about a meaning
+   */
+  async getMeaningDetails(
+    meaningId: number,
+    datasets?: string
+  ): Promise<MeaningDetails | undefined> {
+    const endpoint = datasets
+      ? `/api/meaning/details/${meaningId}/${encodeURIComponent(datasets)}`
+      : `/api/meaning/details/${meaningId}`;
+
+    return this.request(endpoint, MeaningDetailsSchema);
   }
 
   /**

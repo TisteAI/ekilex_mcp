@@ -8,10 +8,14 @@ import {
   createGetWordDetailsHandler,
   searchMeaningTool,
   createSearchMeaningHandler,
+  getMeaningDetailsTool,
+  createGetMeaningDetailsHandler,
   listDatasetsTool,
   createListDatasetsHandler,
   getClassifiersTool,
   createGetClassifiersHandler,
+  getDomainsTool,
+  createGetDomainsHandler,
 } from './tools/index.js';
 
 /**
@@ -84,6 +88,22 @@ export function createServer(options: CreateServerOptions): McpServer {
     createGetClassifiersHandler(client)
   );
 
+  // Register get_meaning_details tool
+  server.tool(
+    getMeaningDetailsTool.name,
+    getMeaningDetailsTool.description,
+    getMeaningDetailsTool.inputSchema.shape,
+    createGetMeaningDetailsHandler(client)
+  );
+
+  // Register get_domains tool
+  server.tool(
+    getDomainsTool.name,
+    getDomainsTool.description,
+    getDomainsTool.inputSchema.shape,
+    createGetDomainsHandler(client)
+  );
+
   return server;
 }
 
@@ -95,7 +115,9 @@ export function getToolDescriptions(): { name: string; description: string }[] {
     { name: searchWordTool.name, description: searchWordTool.description },
     { name: getWordDetailsTool.name, description: getWordDetailsTool.description },
     { name: searchMeaningTool.name, description: searchMeaningTool.description },
+    { name: getMeaningDetailsTool.name, description: getMeaningDetailsTool.description },
     { name: listDatasetsTool.name, description: listDatasetsTool.description },
     { name: getClassifiersTool.name, description: getClassifiersTool.description },
+    { name: getDomainsTool.name, description: getDomainsTool.description },
   ];
 }

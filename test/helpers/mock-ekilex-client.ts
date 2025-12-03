@@ -7,6 +7,7 @@ import type {
   Classifier,
   Domain,
   MeaningSearchResult,
+  MeaningDetails,
 } from '../../src/types/index.js';
 
 /**
@@ -91,6 +92,21 @@ export const mockMeaningSearchResults: MeaningSearchResult[] = [
   },
 ];
 
+export const mockMeaningDetails: MeaningDetails = {
+  meaningId: 1,
+  definitions: [
+    { value: 'A greeting used when meeting someone', lang: 'eng' },
+    { value: 'Tervitus kohtudes', lang: 'est' },
+  ],
+  words: [
+    { wordId: 1, wordValue: 'tere', lang: 'est', homonymNr: 1 },
+    { wordId: 2, wordValue: 'tervitus', lang: 'est' },
+  ],
+  domainCodes: ['everyday'],
+  registerCodes: ['informal'],
+  notes: ['Common greeting in Estonian'],
+};
+
 /**
  * Create a mock Ekilex API client for testing
  */
@@ -101,6 +117,7 @@ export function createMockEkilexClient(
     searchWord: vi.fn().mockResolvedValue(mockWordSearchResults),
     getWordDetails: vi.fn().mockResolvedValue(mockWordDetails),
     searchMeaning: vi.fn().mockResolvedValue(mockMeaningSearchResults),
+    getMeaningDetails: vi.fn().mockResolvedValue(mockMeaningDetails),
     getDatasets: vi.fn().mockResolvedValue(mockDatasets),
     getClassifiers: vi.fn().mockResolvedValue(mockClassifiers),
     getDomains: vi.fn().mockResolvedValue(mockDomains),

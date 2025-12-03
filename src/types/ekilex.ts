@@ -145,3 +145,39 @@ export const MeaningSearchResultSchema = z.object({
 });
 
 export type MeaningSearchResult = z.infer<typeof MeaningSearchResultSchema>;
+
+/**
+ * Word in meaning details
+ */
+export const MeaningWordSchema = z.object({
+  wordId: z.number(),
+  wordValue: z.string(),
+  lang: z.string(),
+  homonymNr: z.number().optional(),
+});
+
+export type MeaningWord = z.infer<typeof MeaningWordSchema>;
+
+/**
+ * Definition in meaning details
+ */
+export const MeaningDefinitionSchema = z.object({
+  value: z.string(),
+  lang: z.string().optional(),
+});
+
+export type MeaningDefinition = z.infer<typeof MeaningDefinitionSchema>;
+
+/**
+ * Complete meaning details from Ekilex API
+ */
+export const MeaningDetailsSchema = z.object({
+  meaningId: z.number(),
+  definitions: z.array(MeaningDefinitionSchema).optional(),
+  words: z.array(MeaningWordSchema).optional(),
+  domainCodes: z.array(z.string()).optional(),
+  registerCodes: z.array(z.string()).optional(),
+  notes: z.array(z.string()).optional(),
+});
+
+export type MeaningDetails = z.infer<typeof MeaningDetailsSchema>;
