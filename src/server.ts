@@ -50,63 +50,77 @@ export function createServer(options: CreateServerOptions): McpServer {
   const server = new McpServer(SERVER_INFO);
 
   // Register search_word tool
-  server.tool(
+  server.registerTool(
     searchWordTool.name,
-    searchWordTool.description,
-    searchWordTool.inputSchema.shape,
+    {
+      description: searchWordTool.description,
+      inputSchema: searchWordTool.inputSchema.shape,
+    },
     createSearchWordHandler(client)
   );
 
   // Register get_word_details tool
-  server.tool(
+  server.registerTool(
     getWordDetailsTool.name,
-    getWordDetailsTool.description,
-    getWordDetailsTool.inputSchema.shape,
+    {
+      description: getWordDetailsTool.description,
+      inputSchema: getWordDetailsTool.inputSchema.shape,
+    },
     createGetWordDetailsHandler(client)
   );
 
   // Register search_meaning tool
-  server.tool(
+  server.registerTool(
     searchMeaningTool.name,
-    searchMeaningTool.description,
-    searchMeaningTool.inputSchema.shape,
+    {
+      description: searchMeaningTool.description,
+      inputSchema: searchMeaningTool.inputSchema.shape,
+    },
     createSearchMeaningHandler(client)
   );
 
   // Register list_datasets tool
-  server.tool(
+  server.registerTool(
     listDatasetsTool.name,
-    listDatasetsTool.description,
-    listDatasetsTool.inputSchema.shape,
+    {
+      description: listDatasetsTool.description,
+      inputSchema: listDatasetsTool.inputSchema.shape,
+    },
     createListDatasetsHandler(client)
   );
 
   // Register get_classifiers tool
-  server.tool(
+  server.registerTool(
     getClassifiersTool.name,
-    getClassifiersTool.description,
-    getClassifiersTool.inputSchema.shape,
+    {
+      description: getClassifiersTool.description,
+      inputSchema: getClassifiersTool.inputSchema.shape,
+    },
     createGetClassifiersHandler(client)
   );
 
   // Register get_meaning_details tool
-  server.tool(
+  server.registerTool(
     getMeaningDetailsTool.name,
-    getMeaningDetailsTool.description,
-    getMeaningDetailsTool.inputSchema.shape,
+    {
+      description: getMeaningDetailsTool.description,
+      inputSchema: getMeaningDetailsTool.inputSchema.shape,
+    },
     createGetMeaningDetailsHandler(client)
   );
 
   // Register get_domains tool
-  server.tool(
+  server.registerTool(
     getDomainsTool.name,
-    getDomainsTool.description,
-    getDomainsTool.inputSchema.shape,
+    {
+      description: getDomainsTool.description,
+      inputSchema: getDomainsTool.inputSchema.shape,
+    },
     createGetDomainsHandler(client)
   );
 
   // Register datasets resource
-  server.resource(
+  server.registerResource(
     'datasets',
     'ekilex://datasets',
     {
@@ -128,7 +142,7 @@ export function createServer(options: CreateServerOptions): McpServer {
   );
 
   // Register classifiers resource template
-  server.resource(
+  server.registerResource(
     'classifiers',
     new ResourceTemplate('ekilex://classifiers/{type}', { list: undefined }),
     {
@@ -167,7 +181,7 @@ export function createServer(options: CreateServerOptions): McpServer {
   );
 
   // Register domains resource template
-  server.resource(
+  server.registerResource(
     'domains',
     new ResourceTemplate('ekilex://domains/{origin}', { list: undefined }),
     {

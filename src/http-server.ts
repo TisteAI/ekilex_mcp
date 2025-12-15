@@ -1,5 +1,5 @@
 import express, { type Express, type Request, type Response } from 'express';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Config } from './config/index.js';
 import { createLogger, type Logger } from './logger.js';
@@ -30,7 +30,7 @@ export class HttpServer {
   private readonly config: Config;
   private readonly logger: Logger;
   private server?: ReturnType<Express['listen']>;
-  private transport?: SSEServerTransport;
+  private transport?: StreamableHTTPServerTransport;
 
   constructor(options: HttpServerOptions) {
     this.mcpServer = options.mcpServer;
@@ -74,34 +74,51 @@ export class HttpServer {
       });
     });
 
-    // MCP SSE endpoint
-    this.app.get('/sse', async (req: Request, res: Response) => {
-      this.logger.info('New SSE connection');
+    // MCP StreamableHTTP endpoint
+    this.app.all('/sse', async (req: Request, res: Response) => {
+      this.logger.info(`StreamableHTTP ${req.method} request`);
 
-      // Create SSE transport for this connection
-      this.transport = new SSEServerTransport('/message', res);
-
-      // Connect MCP server to transport
-      await this.mcpServer.connect(this.transport);
-
-      // Handle client disconnect
-      req.on('close', () => {
-        this.logger.info('SSE connection closed');
-      });
-    });
-
-    // MCP message endpoint (for SSE transport)
-    this.app.post('/message', async (req: Request, res: Response) => {
       if (!this.transport) {
-        res.status(503).json({ error: 'No active SSE connection' });
-        return;
+        // Create StreamableHTTP transport for this connection
+        this.transport = new StreamableHTTPServerTransport({
+          sessionIdGenerator: () => `session-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        });
+
+        // Connect MCP server to transport
+        await this.mcpServer.connect(this.transport);
       }
 
       try {
-        await this.transport.handlePostMessage(req, res);
+        await this.transport.handleRequest(req, res, req.body);
+      } catch (error) {
+        this.logger.error('Error handling request:', error);
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Internal server error' });
+        }
+      }
+    });
+
+    // MCP message endpoint (for backward compatibility)
+    this.app.post('/message', async (req: Request, res: Response) => {
+      this.logger.info('Message POST request');
+
+      if (!this.transport) {
+        // Create StreamableHTTP transport if not exists
+        this.transport = new StreamableHTTPServerTransport({
+          sessionIdGenerator: () => `session-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        });
+
+        // Connect MCP server to transport
+        await this.mcpServer.connect(this.transport);
+      }
+
+      try {
+        await this.transport.handleRequest(req, res, req.body);
       } catch (error) {
         this.logger.error('Error handling message:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Internal server error' });
+        }
       }
     });
 
